@@ -1,0 +1,17 @@
+# Example vendor profile — illustrates a multi-pattern road + zone vendor.
+vendor: "Safexpress"
+aliases:
+  FRK: Faridabad
+  BLR: Bangalore
+  HPR: Hapur
+hints:
+  expected_patterns: [VEHICLE_MATRIX, ZONE_MATRIX, STATE_ZONE_MAPPING]
+  page_keywords: [annexure, rate card, freight, zone, vehicle]
+  header_synonyms:
+    rate: [freight, amount, charges, rs]
+    vehicle: [truck, vehicle type, lorry, vehicle]
+    origin: [from, origin, ex]
+    destination: [to, destination, delivery]
+multi_value_delimiters: ["/", ",", "&"]
+zone_scheme: ABCD
+output_template: mankind_default_v2

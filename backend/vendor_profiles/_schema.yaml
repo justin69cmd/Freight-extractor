@@ -1,0 +1,27 @@
+# Vendor profile schema (Enhancement #5 + no-code onboarding)
+# A new vendor is described here, NOT in Python. The pipeline reads this to bias
+# page classification, header mapping, pattern expectation, and route expansion.
+#
+# Fields:
+#   vendor                 : display name (must match a Vendor row)
+#   aliases                : map of shorthand -> canonical place name
+#   hints.expected_patterns: PricingPattern values likely in this vendor's docs
+#   hints.page_keywords    : tokens that mark a page as a rate card / annexure
+#   hints.header_synonyms  : logical field -> list of header strings to match
+#   multi_value_delimiters : characters that split a multi-value cell (route expansion)
+#   zone_scheme            : label set used by this vendor's zones (e.g. ABCD)
+#   output_template        : Mankind Excel template to render for this vendor
+
+vendor: "<Vendor Name>"
+aliases: {}
+hints:
+  expected_patterns: []
+  page_keywords: [annexure, rate, freight, zone]
+  header_synonyms:
+    rate: [freight, amount, charges, rs, rate]
+    origin: [from, source, origin]
+    destination: [to, dest, destination]
+    vehicle: [truck, vehicle type, lorry]
+multi_value_delimiters: ["/", ",", "&"]
+zone_scheme: ABCD
+output_template: mankind_default_v2
