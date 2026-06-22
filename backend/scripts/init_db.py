@@ -21,10 +21,12 @@ log = logging.getLogger("freight.init_db")
 
 def main() -> None:
     setup_logging()
-    with engine.begin() as conn:
-        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+    # pgvector extension only exists on Postgres; SQLite (local mode) skips it.
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as conn:
+            conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     Base.metadata.create_all(bind=engine)
-    log.info("database initialized: pgvector extension + %d tables", len(Base.metadata.tables))
+    log.info("database initialized (%s): %d tables", engine.dialect.name, len(Base.metadata.tables))
 
 
 if __name__ == "__main__":

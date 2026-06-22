@@ -29,10 +29,35 @@ PDF ─► L0 ingest ─► L1 extract ─► L2 classify ─► L1.5 metadata/c
 6. AI explanation / full traceability (agreement → page → table → cell)
 
 ## Quick start
+
+### Option A — Native local mode (no Docker)
+Runs on **SQLite + in-process jobs** — no Postgres, Redis, or Docker. Handles
+digital (text-based) PDFs. Needs only **Python 3.11+** and **Node 20+**.
+
+**macOS / Linux** (two terminals):
+```bash
+./start-backend.sh      # terminal 1 → http://localhost:8000
+./start-frontend.sh     # terminal 2 → http://localhost:3000
+```
+**Windows 11** (PowerShell, two windows):
+```powershell
+.\start-backend.ps1     # terminal 1 → http://localhost:8000
+.\start-frontend.ps1    # terminal 2 → http://localhost:3000
+```
+Each script sets up its environment (venv / npm install), creates the SQLite DB,
+and starts the server. First run takes a minute; after that it's instant.
+
+> Local mode skips the heavy OCR/ML stack, so **scanned** PDFs aren't OCR'd —
+> use Docker for those. Born-digital agreements (incl. the bundled sample) work fully.
+
+### Option B — Docker (full stack: Postgres + pgvector + Redis + workers)
 ```bash
 docker compose -f infra/docker-compose.yml up --build
 # UI http://localhost:3000 · API docs http://localhost:8000/docs
 ```
+
+The same code runs both ways — `FREIGHT_DATABASE_URL` and `FREIGHT_JOB_EXECUTOR`
+switch between SQLite/threads (local) and Postgres/Celery (Docker).
 
 ## Build phases (all complete)
 | Phase | Scope | Status |

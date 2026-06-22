@@ -6,12 +6,17 @@ fingerprint (Enhancement #5). This is the single entry point the pipeline calls.
 """
 from __future__ import annotations
 
+import logging
+
 from app.core.enums import PageKind
+from app.core.exceptions import ExtractionError
 from app.extraction.digital_extractor import extract_digital_tables
 from app.extraction.ocr_extractor import extract_scanned_tables
 from app.extraction.raw_table import RawTable
 from app.ingestion.page_classifier import classify_page
 from app.ingestion.pdf_loader import LoadedDocument
+
+log = logging.getLogger("freight.extractor")
 
 # Page kinds that carry pricing tables worth extracting.
 _TABLE_PAGE_KINDS = {PageKind.RATE_CARD, PageKind.ANNEXURE, PageKind.ZONE_MAP, PageKind.MIXED}
@@ -32,7 +37,13 @@ def extract_tables(
             page_tables = extract_digital_tables(doc.path, page.number)
         elif kind in _TABLE_PAGE_KINDS:
             # OCR is expensive; only run it on pages that look like rate content.
-            page_tables = extract_scanned_tables(doc.path, page.number)
+            # In slim local mode the OCR libs may be absent — skip the page with a
+            # warning rather than failing the whole job.
+            try:
+                page_tables = extract_scanned_tables(doc.path, page.number)
+            except ExtractionError as exc:
+                log.warning("skipping scanned page %d (OCR unavailable): %s", page.number, exc)
+                page_tables = []
         else:
             page_tables = []
 

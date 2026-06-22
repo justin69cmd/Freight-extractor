@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.canonical import repository as repo
 from app.canonical.schemas import AgreementMetadataOut, ExtractedTableOut, UploadResponse
-from app.core.tasks import process_agreement
+from app.core.executor import dispatch_pipeline
 from app.db import get_db
 from app.storage import storage
 
@@ -35,8 +35,8 @@ async def upload_agreement(
     job = repo.create_job(db, agreement)
     db.commit()
 
-    # Hand off to the worker; the API thread never does heavy PDF work.
-    process_agreement.delay(str(job.id))
+    # Hand off to the executor (background thread locally, Celery worker in prod).
+    dispatch_pipeline(job.id)
 
     return UploadResponse(job_id=job.id, agreement_id=agreement.id, status=job.status)
 

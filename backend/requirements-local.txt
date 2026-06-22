@@ -1,0 +1,19 @@
+# Slim dependency set for native local mode (no Docker, no Postgres/Redis).
+# Runs SQLite + in-process threaded jobs. Handles DIGITAL (text-based) PDFs.
+# Scanned-PDF OCR (EasyOCR/OpenCV/Camelot) and Celery/Postgres are intentionally
+# excluded to keep the install small and cross-platform — use Docker for those.
+
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.6
+python-multipart>=0.0.12
+
+sqlalchemy>=2.0          # SQLite driver ships with Python (no psycopg needed)
+
+pdfplumber>=0.11         # digital table + text extraction
+openpyxl>=3.1            # Excel export
+
+# Optional AI (lazy-imported; only needed if you set API keys):
+anthropic>=0.39
+openai>=1.54

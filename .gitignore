@@ -26,6 +26,9 @@ yarn-error.log*
 # --- app artifacts ---
 backend/_storage/
 _storage/
+*.db
+*.sqlite
+*.sqlite3
 # generated Mankind output workbooks (keep template workbooks, if any)
 *.xlsx
 !**/templates/*.xlsx

@@ -22,8 +22,15 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # --- persistence ---
-    database_url: str = "postgresql+psycopg://freight:freight@localhost:5432/freight"
+    # Default = zero-install local mode (SQLite). Docker/production overrides this
+    # with a Postgres+pgvector URL via the compose `environment` block.
+    database_url: str = "sqlite:///./freight.db"
     redis_url: str = "redis://localhost:6379/0"
+
+    # --- job execution -------------------------------------------------------
+    # "thread" runs the pipeline in-process (no Redis/Celery needed) — used for
+    # native local mode. "celery" dispatches to a worker — used in Docker/prod.
+    job_executor: str = "thread"
 
     # --- object storage (PDFs, table crops, generated xlsx) ---
     storage_backend: str = "local"  # local | s3 | minio

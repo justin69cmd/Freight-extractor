@@ -165,16 +165,30 @@ def _analytics(db: Session, pq: ParsedQuery, top_k: int) -> SearchResponse:
 
 # --- shared helpers -------------------------------------------------------- #
 def _vector_chunks(db: Session, text: str, kind: ReviewItemKind, top_k: int):
-    """Return [(DocumentChunk, score)] ordered by cosine similarity (pgvector)."""
+    """Return [(DocumentChunk, score)] ordered by cosine similarity.
+
+    Postgres uses pgvector's indexed cosine_distance; SQLite (local mode) has no
+    vector index, so we load the candidate chunks and rank in Python.
+    """
     vec = embed(text)
-    dist = DocumentChunk.embedding.cosine_distance(vec)
-    stmt = (
-        select(DocumentChunk, dist.label("d"))
-        .where(DocumentChunk.kind == kind)
-        .order_by(dist)
-        .limit(top_k)
+    if db.get_bind().dialect.name == "postgresql":
+        dist = DocumentChunk.embedding.cosine_distance(vec)
+        stmt = (
+            select(DocumentChunk, dist.label("d"))
+            .where(DocumentChunk.kind == kind)
+            .order_by(dist)
+            .limit(top_k)
+        )
+        return [(row[0], 1.0 - float(row[1])) for row in db.execute(stmt)]
+
+    from app.search.embedder import cosine
+
+    rows = list(db.scalars(select(DocumentChunk).where(DocumentChunk.kind == kind)))
+    scored = sorted(
+        ((c, cosine(vec, c.embedding or [])) for c in rows),
+        key=lambda x: x[1], reverse=True,
     )
-    return [(row[0], 1.0 - float(row[1])) for row in db.execute(stmt)]
+    return scored[:top_k]
 
 
 def _vector_response(db: Session, pq: ParsedQuery, kind: ReviewItemKind, top_k: int) -> SearchResponse:
