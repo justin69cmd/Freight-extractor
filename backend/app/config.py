@@ -1,5 +1,4 @@
 """Application settings, loaded from environment / .env.
-
 All tunables (confidence-band thresholds, AI provider, storage) live here so that
 behaviour can change without code edits — a core requirement of the platform.
 """
@@ -49,6 +48,7 @@ class Settings(BaseSettings):
     ai_provider: str = "anthropic"  # anthropic | openai
     anthropic_api_key: str | None = None
     openai_api_key: str | None = None
+    openai_base_url: str | None = None  # set to NVIDIA NIM endpoint to use NIM instead of OpenAI
     ai_model_validation: str = "claude-opus-4-8"      # hard repair / zone inference
     ai_model_classify: str = "claude-haiku-4-5-20251001"  # cheap tiebreaks
     ai_per_job_call_budget: int = 50  # hard cap on LLM calls per agreement

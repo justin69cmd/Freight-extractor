@@ -59,11 +59,10 @@ class LLMAdapter:
             raise AIValidationError("openai SDK not installed") from exc
         if not settings.openai_api_key:
             raise AIValidationError("FREIGHT_OPENAI_API_KEY not set")
-        client = OpenAI(api_key=settings.openai_api_key)
+        client = OpenAI(api_key=settings.openai_api_key, base_url=settings.openai_base_url)
         resp = client.chat.completions.create(
             model=model,
             max_tokens=max_tokens,
-            response_format={"type": "json_object"},
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},

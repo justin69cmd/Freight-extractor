@@ -17,3 +17,10 @@ openpyxl>=3.1            # Excel export
 # Optional AI (lazy-imported; only needed if you set API keys):
 anthropic>=0.39
 openai>=1.54
+
+# OCR support enabled locally:
+easyocr==1.7.2
+opencv-contrib-python==4.10.0.84
+
+img2table==2.0.0
+pandas>=2.0
